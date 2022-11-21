@@ -1,0 +1,22 @@
+textarea {
+    min-height: 400px;
+}
+
+.emailDiv {
+    border: solid 1px grey;
+    margin-bottom: 10px;
+    padding-left: 5px;
+    font-size: 10px;
+}
+
+.emailDiv button {
+    text-align: right;
+}
+
+h4 {
+    font-size: 20px;
+}
+
+h5 {
+    font-size: 20px;
+}
