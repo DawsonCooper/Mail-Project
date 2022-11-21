@@ -6,7 +6,7 @@ textarea {
     border: solid 1px grey;
     margin-bottom: 10px;
     padding-left: 5px;
-    font-size: 10px;
+    font-size: 15px;
 }
 
 .emailDiv button {
@@ -14,7 +14,7 @@ textarea {
 }
 
 h4 {
-    font-size: 20px;
+    font-size: 25px;
 }
 
 h5 {
