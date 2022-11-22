@@ -10,6 +10,55 @@ document.addEventListener('DOMContentLoaded', function() {
     load_mailbox('inbox');
 });
 
+//------- FUNCTION WILL BE USED IN FOR EACH LOOP LOADS EMAIL USING PASSED ARGUMENT ---------/
+function display_mail(email) {
+    let emailDiv = document.createElement('div');
+    emailDiv.setAttribute('id', email.id);
+    emailDiv.setAttribute('class', "emailDiv")
+    let sender = document.createElement('h4');
+    sender.innerText = email.sender;
+    let subject = document.createElement('h5');
+    subject.innerText = email.subject;
+    let timestamp = document.createElement('p');
+    timestamp.innerText = email.timestamp;
+    emailDiv.appendChild(sender);
+    emailDiv.appendChild(subject);
+    emailDiv.appendChild(timestamp);
+    document.querySelector('#emails-view').appendChild(emailDiv);
+
+    return emailDiv;
+}
+// ---------    FUNCTION WILL BE USED TO DISPLAY A SINGLE EMAIL USED IN EACH INBOX ---------------- //
+function full_email(email) {
+    let emailSection = document.querySelector('#single-email-view');
+    let header = document.createElement('div');
+    let leftHeader = document.createElement('div');
+    let rightHeader = document.createElement('div');
+    let body = document.createElement('div');
+    let archive = document.createElement('button');
+    let reply = document.createElement('button');
+
+    // Create the elements for the left side of the header //
+    let subject = document.createElement('h4')
+    subject.innerText = email.subject;
+    let sender = document.createElement('h6')
+    sender.innerText = ("From: " + email.sender);
+    //  TODO:  We will want to display something to imply that this select menu is just recipients //
+    let recipients = document.createElement('select');
+    email.recipients.forEach(user => {
+        let option = document.createElement('option');
+        option.innerText = user;
+        recipients.appendChild(option);
+    })
+    leftHeader.appendChild(subject);
+    leftHeader.appendChild(sender);
+    leftHeader.appendChild(recipients);
+    header.appendChild(leftHeader);
+    // Create the elements for the right side of the header //
+
+    emailSection.appendChild(header);
+}
+
 function compose_email() {
 
     // Show compose view and hide other views
@@ -56,9 +105,12 @@ function load_mailbox(mailbox) {
 
     // Show the mailbox and hide other views
 
-    document.querySelector('#emails-view').style.display = 'block';
-    document.querySelector('#compose-view').style.display = 'none';
-
+    const emailsView = document.querySelector('#emails-view');
+    const composeView = document.querySelector('#compose-view');
+    const singleEmailView = document.querySelector('#single-email-view');
+    emailsView.style.display = 'block';
+    composeView.style.display = 'none';
+    singleEmailView.style.display = 'none';
     // Show the mailbox name
 
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -68,25 +120,12 @@ function load_mailbox(mailbox) {
                 console.log(emails);
                 emails.forEach(email => {
                     // create html to display the emails content
-                    let emailDiv = document.createElement('div');
-                    emailDiv.setAttribute('id', email.id);
-                    emailDiv.setAttribute('class', "emailDiv")
-                    let recipient = document.createElement('h4');
-                    recipient.innerText = email.recipients;
-                    let subject = document.createElement('h5');
-                    subject.innerText = email.subject;
-                    let timestamp = document.createElement('p');
-                    timestamp.innerText = email.timestamp;
-                    emailDiv.appendChild(recipient);
-                    emailDiv.appendChild(subject);
-                    emailDiv.appendChild(timestamp);
-                    document.querySelector('#emails-view').appendChild(emailDiv);
-                    // Need to add view email function
+                    emailDiv = display_mail(email);
+
                     emailDiv.addEventListener('click', function() {
-
-                        //USER SHOULD BE ABLE TO SEE THE EMAIL IN IT ENTIRETY AND ARCHIVE IT 
-                        document.querySelector('#emails-view').style.display = 'none';
-
+                        emailsView.style.display = 'none';
+                        singleEmailView.style.display = 'block';
+                        full_email(email);
 
                     });
                 }).catch(error => console.log(error));
@@ -98,20 +137,7 @@ function load_mailbox(mailbox) {
                 console.log(emails);
                 emails.forEach(email => {
                     // create html to display the emails content
-                    let emailDiv = document.createElement('div');
-                    emailDiv.setAttribute('id', email.id);
-                    emailDiv.setAttribute('class', "emailDiv")
-                    let sender = document.createElement('h4');
-                    sender.innerText = email.sender;
-                    let subject = document.createElement('h5');
-                    subject.innerText = email.subject;
-                    let timestamp = document.createElement('p');
-                    timestamp.innerText = email.timestamp;
-                    emailDiv.appendChild(sender);
-                    emailDiv.appendChild(subject);
-                    emailDiv.appendChild(timestamp);
-
-                    document.querySelector('#emails-view').appendChild(emailDiv);
+                    emailDiv = display_mail(email);
                     // Need to add view email function
                     if (!email.read) {
                         emailDiv.style["background-color"] = ("rgba(192, 192, 192");
@@ -122,7 +148,9 @@ function load_mailbox(mailbox) {
                             method: 'PUT',
                             body: JSON.stringify({ read: true })
                         }).catch(error => console.log(error));
-                        document.querySelector('#emails-view').style.display = 'none';
+                        emailsView.style.display = 'none';
+                        singleEmailView.style.display = 'block';
+                        full_email(email);
                     });
                 })
             })
