@@ -20,3 +20,16 @@ h4 {
 h5 {
     font-size: 20px;
 }
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#right-header {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+}

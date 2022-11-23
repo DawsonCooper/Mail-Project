@@ -30,33 +30,89 @@ function display_mail(email) {
 }
 // ---------    FUNCTION WILL BE USED TO DISPLAY A SINGLE EMAIL USED IN EACH INBOX ---------------- //
 function full_email(email) {
-    let emailSection = document.querySelector('#single-email-view');
-    let header = document.createElement('div');
-    let leftHeader = document.createElement('div');
-    let rightHeader = document.createElement('div');
-    let body = document.createElement('div');
-    let archive = document.createElement('button');
-    let reply = document.createElement('button');
+    emailsView = document.querySelector('#emails-view');
+    while (emailsView.firstChild) {
+        emailsView.removeChild(emailsView.firstChild);
+    }
+    let emailSection = document.createElement('div');
+    emailSection.setAttribute('id', 'single-email-view');
 
-    // Create the elements for the left side of the header //
-    let subject = document.createElement('h4')
-    subject.innerText = email.subject;
-    let sender = document.createElement('h6')
-    sender.innerText = ("From: " + email.sender);
-    //  TODO:  We will want to display something to imply that this select menu is just recipients //
+
+    let header = document.createElement('div');
+    header.setAttribute('id', "header");
+    let leftHeader = document.createElement('div');
+    leftHeader.setAttribute('id', "left-header");
+    let rightHeader = document.createElement('div');
+    rightHeader.setAttribute('id', "right-header");
+    let body = document.createElement('div');
+    body.setAttribute('id', "eamil-body");
+    let archive = document.createElement('button');
+    archive.setAttribute('id', "archive");
+    let reply = document.createElement('button');
+    reply.setAttribute('id', "reply");
+    let replyAll = document.createElement('button');
+    replyAll.setAttribute('id', "reply-all");
+
+
+    // FILLS LEFT HEADER //
+
+    let usernameString = email.sender.split(/@/i);
+    usernameString = usernameString[0];
+    usernameString = usernameString.charAt(0).toUpperCase() + usernameString.slice(1);
+    let sender = document.createElement('p')
+    sender.innerText = (`${usernameString} <${email.sender}>`);
     let recipients = document.createElement('select');
+    let firstOption = document.createElement('option');
+    firstOption.innerText = "Recipients: ";
+    firstOption.setAttribute("disabled", "true");
+    firstOption.setAttribute("selected", "true");
+    recipients.appendChild(firstOption);
     email.recipients.forEach(user => {
         let option = document.createElement('option');
         option.innerText = user;
         recipients.appendChild(option);
     })
-    leftHeader.appendChild(subject);
+    console.log("id " + email.id)
+    archive.addEventListener('click', function() {
+        fetch(`/emails/${email.id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+                archived: placeholder
+            })
+        }).catch(error => alert("email archive failed: " + error))
+        load_mailbox("inbox")
+    });
+
+    // FILLS RIGHT HEADER //
+    var placeholder;
+    let timestamp = document.createElement('p');
+    timestamp.innerText = email.timestamp;
+    rightHeader.appendChild(timestamp);
+    console.log("archive status " + email.archived);
+    if (email.archived == true) {
+        archive.innerText = "Unarchive";
+        placeholder = false;
+    } else {
+        archive.innerText = "Archive";
+        placeholder = true;
+
+    }
+    rightHeader.appendChild(archive);
+    console.log("placeholders value: " + placeholder);
+
+    // FILLS BODY AND BUTTONS //
+
+    body.innerText = email.body;
+
+
+
     leftHeader.appendChild(sender);
     leftHeader.appendChild(recipients);
     header.appendChild(leftHeader);
-    // Create the elements for the right side of the header //
-
+    header.appendChild(rightHeader);
     emailSection.appendChild(header);
+    emailsView.appendChild(emailSection);
+    // LISTENS TO BUTTONS//
 }
 
 function compose_email() {
@@ -107,10 +163,8 @@ function load_mailbox(mailbox) {
 
     const emailsView = document.querySelector('#emails-view');
     const composeView = document.querySelector('#compose-view');
-    const singleEmailView = document.querySelector('#single-email-view');
     emailsView.style.display = 'block';
     composeView.style.display = 'none';
-    singleEmailView.style.display = 'none';
     // Show the mailbox name
 
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -123,8 +177,26 @@ function load_mailbox(mailbox) {
                     emailDiv = display_mail(email);
 
                     emailDiv.addEventListener('click', function() {
-                        emailsView.style.display = 'none';
-                        singleEmailView.style.display = 'block';
+
+                        full_email(email);
+
+                    });
+                }).catch(error => console.log(error));
+            })
+    }
+    if (mailbox == 'archive') {
+        fetch('/emails/archive').then(response => response.json())
+            .then(emails => {
+                console.log("email array: " + emails);
+                if (emails.length <= 0) {
+                    return 1;
+                }
+                emails.forEach(email => {
+                    // create html to display the emails content
+                    emailDiv = display_mail(email);
+
+                    emailDiv.addEventListener('click', function() {
+
                         full_email(email);
 
                     });
@@ -134,7 +206,10 @@ function load_mailbox(mailbox) {
     if (mailbox === 'inbox') {
         fetch('/emails/inbox').then(response => response.json())
             .then(emails => {
-                console.log(emails);
+                console.log("email array: " + emails);
+                if (emails.length <= 0) {
+                    return 1;
+                }
                 emails.forEach(email => {
                     // create html to display the emails content
                     emailDiv = display_mail(email);
@@ -148,8 +223,7 @@ function load_mailbox(mailbox) {
                             method: 'PUT',
                             body: JSON.stringify({ read: true })
                         }).catch(error => console.log(error));
-                        emailsView.style.display = 'none';
-                        singleEmailView.style.display = 'block';
+
                         full_email(email);
                     });
                 })
