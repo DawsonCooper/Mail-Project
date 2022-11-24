@@ -5,8 +5,11 @@ textarea {
 .emailDiv {
     border: solid 1px grey;
     margin-bottom: 10px;
-    padding-left: 5px;
+    padding: 5px;
     font-size: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .emailDiv button {
@@ -14,11 +17,11 @@ textarea {
 }
 
 h4 {
-    font-size: 25px;
+    font-size: 20px;
 }
 
 h5 {
-    font-size: 20px;
+    font-size: 15px;
 }
 
 #header {
@@ -30,6 +33,26 @@ h5 {
 #right-header {
     text-align: right;
     display: flex;
+    align-items: flex-end;
     flex-direction: column;
     height: auto;
+}
+
+img {
+    height: 30px;
+    width: 30px;
+    background-color: transparent;
+}
+
+.myButtons {
+    padding: 0px;
+    border: none;
+    height: 50px;
+    width: 50px;
+    background-color: transparent;
+    border-radius: 50%;
+}
+
+.myButtons:hover {
+    background-color: rgba(192, 192, 192, 0.5);
 }

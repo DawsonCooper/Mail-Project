@@ -48,10 +48,14 @@ function full_email(email) {
     body.setAttribute('id', "eamil-body");
     let archive = document.createElement('button');
     archive.setAttribute('id', "archive");
+    archive.setAttribute('class', "myButtons");
     let reply = document.createElement('button');
     reply.setAttribute('id', "reply");
+    reply.setAttribute('class', "myButtons");
     let replyAll = document.createElement('button');
     replyAll.setAttribute('id', "reply-all");
+    replyAll.setAttribute('class', "myButtons");
+    let footer = document.createElement('div');
 
 
     // FILLS LEFT HEADER //
@@ -80,7 +84,9 @@ function full_email(email) {
                 archived: placeholder
             })
         }).catch(error => alert("email archive failed: " + error))
-        load_mailbox("inbox")
+        location.reload(true);
+        load_mailbox("inbox");
+        return 0;
     });
 
     // FILLS RIGHT HEADER //
@@ -89,20 +95,34 @@ function full_email(email) {
     timestamp.innerText = email.timestamp;
     rightHeader.appendChild(timestamp);
     console.log("archive status " + email.archived);
-    if (email.archived == true) {
-        archive.innerText = "Unarchive";
+    let archiveImage = document.createElement('img');
+    archiveImage.src = "static/mail/images/archive.png";
+    let unarchiveImage = document.createElement('img');
+    unarchiveImage.src = "static/mail/images/unarchive.jpg";
+    if (email.sender == document.querySelector('h2').innerText) {
+        archive.style.display = 'none';
+    } else if (email.archived == true) {
+        archive.appendChild(unarchiveImage);
         placeholder = false;
     } else {
-        archive.innerText = "Archive";
+        archive.appendChild(archiveImage);
         placeholder = true;
 
     }
-    rightHeader.appendChild(archive);
+    let replyImage = document.createElement('img');
+    replyImage.src = "static/mail/images/reply.png";
+    let replyAllImage = document.createElement('img')
+    replyAllImage.src = "static/mail/images/replyall.png";
+    reply.appendChild(replyImage);
+    replyAll.appendChild(replyAllImage);
+    footer.appendChild(reply);
+    footer.appendChild(replyAll);
+    footer.appendChild(archive);
+
     console.log("placeholders value: " + placeholder);
 
     // FILLS BODY AND BUTTONS //
-
-    body.innerText = email.body;
+    body.innerHTML = email.body;
 
 
 
@@ -110,9 +130,37 @@ function full_email(email) {
     leftHeader.appendChild(recipients);
     header.appendChild(leftHeader);
     header.appendChild(rightHeader);
+    rightHeader.appendChild(footer);
     emailSection.appendChild(header);
+    emailSection.appendChild(body)
+
     emailsView.appendChild(emailSection);
+    return 0;
+
     // LISTENS TO BUTTONS//
+}
+
+function compose_send() {
+    const recipients = document.querySelector('#compose-recipients').value;
+    const subject = document.querySelector('#compose-subject').value;
+    const body = document.querySelector('#compose-body').value;
+    fetch('/emails', {
+            method: 'POST',
+            body: JSON.stringify({
+                recipients: recipients,
+                subject: subject,
+                body: body
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            // Print result
+            console.log(result);
+        }).catch(error => console.log(error));
+    localStorage.clear();
+    load_mailbox('sent');
+    return 0;
+
 }
 
 function compose_email() {
@@ -129,38 +177,12 @@ function compose_email() {
 
 
     // Once page is cleared, and loaded we will want to listen to the submit button 
-    document.querySelector('#compose-form').addEventListener('submit', function() {
-        let recipients = document.querySelector('#compose-recipients').value;
-        let subject = document.querySelector('#compose-subject').value;
-        let body = document.querySelector('#compose-body').value;
-
-        fetch('/emails', {
-                method: 'POST',
-                body: JSON.stringify({
-                    recipients: recipients,
-                    subject: subject,
-                    body: body
-                })
-            })
-            .then(response => response.json())
-            .then(result => {
-                // Print result
-                console.log(result);
-                if (result.status === 201) {
-                    load_mailbox('sent')
-                } else {
-                    alert(result['error'])
-                }
-            }).catch(error => console.log(error))
-
-
-    });
+    document.querySelector('#compose-form').addEventListener('submit', compose_send)
 }
 
 function load_mailbox(mailbox) {
 
     // Show the mailbox and hide other views
-
     const emailsView = document.querySelector('#emails-view');
     const composeView = document.querySelector('#compose-view');
     emailsView.style.display = 'block';
@@ -169,6 +191,7 @@ function load_mailbox(mailbox) {
 
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
     if (mailbox == 'sent') {
+        event.preventDefault();
         fetch('/emails/sent').then(response => response.json())
             .then(emails => {
                 console.log(emails);
@@ -181,10 +204,10 @@ function load_mailbox(mailbox) {
                         full_email(email);
 
                     });
-                }).catch(error => console.log(error));
-            })
-    }
-    if (mailbox == 'archive') {
+                })
+            }).catch(error => console.log(error));
+    } else if (mailbox == 'archive') {
+
         fetch('/emails/archive').then(response => response.json())
             .then(emails => {
                 console.log("email array: " + emails);
@@ -194,6 +217,9 @@ function load_mailbox(mailbox) {
                 emails.forEach(email => {
                     // create html to display the emails content
                     emailDiv = display_mail(email);
+                    if (email.read) {
+                        emailDiv.style["background-color"] = ("rgba(192,192,192,.4");
+                    }
 
                     emailDiv.addEventListener('click', function() {
 
@@ -202,8 +228,8 @@ function load_mailbox(mailbox) {
                     });
                 }).catch(error => console.log(error));
             })
-    }
-    if (mailbox === 'inbox') {
+    } else if (mailbox === 'inbox') {
+
         fetch('/emails/inbox').then(response => response.json())
             .then(emails => {
                 console.log("email array: " + emails);
@@ -214,8 +240,8 @@ function load_mailbox(mailbox) {
                     // create html to display the emails content
                     emailDiv = display_mail(email);
                     // Need to add view email function
-                    if (!email.read) {
-                        emailDiv.style["background-color"] = ("rgba(192, 192, 192");
+                    if (email.read) {
+                        emailDiv.style["background-color"] = ("rgba(192,192,192,.4");
                     }
                     emailDiv.addEventListener('click', function() {
                         // Here i will want to display the email and have buttons to archive should also set read to true and maybe a delete button??

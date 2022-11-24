@@ -16,8 +16,8 @@
     </div>
     <div id="compose-view">
         <h3>New Email</h3>
-        <form id="compose-form" action="#">
-            <div class="form-group">
+        <form id="compose-form" >
+            <div class="form-group" action='/'>
                 From: <input disabled id="sender" class="form-control" value="{{ request.user.email }}">
             </div>
             <div class="form-group">
