@@ -45,7 +45,11 @@ img {
 }
 
 .myButtons {
-    padding: 0px;
+    font-size: 12px;
+    font-weight: bold;
+    position: relative;
+    display: inline-block;
+    padding: 5px;
     border: none;
     height: 50px;
     width: 50px;
@@ -55,4 +59,37 @@ img {
 
 .myButtons:hover {
     background-color: rgba(192, 192, 192, 0.5);
+}
+
+span {
+    font-size: 10px;
+    visibility: hidden;
+    position: absolute;
+    background-color: rgba(0, 0, 0, 0.6);
+    width: 60px;
+    bottom: 105%;
+    left: 50%;
+    margin-left: -30px;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    z-index: 1;
+}
+
+.myButtons:hover span {
+    visibility: visible;
+}
+
+#body-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+#email-body {
+    border: solid 2px rgba(192, 192, 192, 0.5);
+    border-radius: 5px;
+    padding: 15px;
+    width: 65%;
 }

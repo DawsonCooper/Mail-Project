@@ -37,6 +37,10 @@ function full_email(email) {
     let emailSection = document.createElement('div');
     emailSection.setAttribute('id', 'single-email-view');
 
+    currentUser = document.querySelector('h2').innerText;
+    currUserName = currentUser.split(/@/i);
+    currUserName = currUserName[0];
+    currUserName = currUserName.charAt(0).toUpperCase() + currUserName.slice(1);
 
     let header = document.createElement('div');
     header.setAttribute('id', "header");
@@ -44,8 +48,10 @@ function full_email(email) {
     leftHeader.setAttribute('id', "left-header");
     let rightHeader = document.createElement('div');
     rightHeader.setAttribute('id', "right-header");
+    let bodyContainer = document.createElement('div');
+    bodyContainer.setAttribute('id', "body-container");
     let body = document.createElement('div');
-    body.setAttribute('id', "eamil-body");
+    body.setAttribute('id', "email-body");
     let archive = document.createElement('button');
     archive.setAttribute('id', "archive");
     archive.setAttribute('class', "myButtons");
@@ -56,7 +62,15 @@ function full_email(email) {
     replyAll.setAttribute('id', "reply-all");
     replyAll.setAttribute('class', "myButtons");
     let footer = document.createElement('div');
-
+    let replyTip = document.createElement('span');
+    let archiveTip = document.createElement('span');
+    let replyAllTip = document.createElement('span');
+    replyTip.innerText = 'Reply';
+    replyAllTip.innerText = 'Reply All';
+    archiveTip.innerText = 'Archive';
+    replyAll.appendChild(replyAllTip);
+    reply.appendChild(replyTip);
+    archive.appendChild(archiveTip);
 
     // FILLS LEFT HEADER //
 
@@ -70,13 +84,16 @@ function full_email(email) {
     firstOption.innerText = "Recipients: ";
     firstOption.setAttribute("disabled", "true");
     firstOption.setAttribute("selected", "true");
+    firstOption.setAttribute("value", "");
     recipients.appendChild(firstOption);
     email.recipients.forEach(user => {
         let option = document.createElement('option');
         option.innerText = user;
+        option.setAttribute("value", user);
         recipients.appendChild(option);
     })
     console.log("id " + email.id)
+        // EVENT LISTENERS FOR REPLIES AND ARCHIVES // 
     archive.addEventListener('click', function() {
         fetch(`/emails/${email.id}`, {
             method: 'PUT',
@@ -88,7 +105,35 @@ function full_email(email) {
         load_mailbox("inbox");
         return 0;
     });
-
+    reply.addEventListener('click', function() {
+            // Hide the email view and load compose view
+            document.querySelector('#emails-view').style.display = 'none';
+            document.querySelector('#compose-view').style.display = 'block';
+            // modify compose subject field to match current emails subject and recipient should match current emails sender
+            document.querySelector('#compose-subject').setAttribute('value', "Re: " + email.subject);
+            // Need to check the select menu and get its value
+            console.log(recipients.value);
+            if (recipients.value != "") {
+                document.querySelector('#compose-recipients').setAttribute('value', recipients.value);
+            } else {
+                document.querySelector('#compose-recipients').setAttribute('value', email.sender);
+            }
+            document.querySelector('#compose-body').innerText = `${currUserName}'s response to ${usernameString}'s email: ${email.body}.`;
+        })
+        // replyAll event lister
+    replyAll.addEventListener('click', function() {
+        let all = []
+        email.recipients.forEach(user => {
+            if (user != currentUser) {
+                all.push(user);
+            }
+        })
+        document.querySelector('#emails-view').style.display = 'none';
+        document.querySelector('#compose-view').style.display = 'block';
+        document.querySelector('#compose-subject').setAttribute('value', "Re: " + email.subject);
+        document.querySelector('#compose-body').innerText = `${currUserName}'s response to ${usernameString}'s email: ${email.body}.`;
+        document.querySelector('#compose-recipients').setAttribute('value', all + "," + email.sender);
+    });
     // FILLS RIGHT HEADER //
     var placeholder;
     let timestamp = document.createElement('p');
@@ -99,7 +144,7 @@ function full_email(email) {
     archiveImage.src = "static/mail/images/archive.png";
     let unarchiveImage = document.createElement('img');
     unarchiveImage.src = "static/mail/images/unarchive.jpg";
-    if (email.sender == document.querySelector('h2').innerText) {
+    if (email.sender == currentUser) {
         archive.style.display = 'none';
     } else if (email.archived == true) {
         archive.appendChild(unarchiveImage);
@@ -125,14 +170,16 @@ function full_email(email) {
     body.innerHTML = email.body;
 
 
-
     leftHeader.appendChild(sender);
     leftHeader.appendChild(recipients);
     header.appendChild(leftHeader);
     header.appendChild(rightHeader);
     rightHeader.appendChild(footer);
     emailSection.appendChild(header);
-    emailSection.appendChild(body)
+    emailSection.appendChild(document.createElement('hr'));
+    bodyContainer.appendChild(body);
+    emailSection.appendChild(bodyContainer);
+
 
     emailsView.appendChild(emailSection);
     return 0;
@@ -159,7 +206,7 @@ function compose_send() {
         }).catch(error => console.log(error));
     localStorage.clear();
     load_mailbox('sent');
-    return 0;
+    return false;
 
 }
 
