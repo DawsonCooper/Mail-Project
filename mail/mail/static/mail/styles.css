@@ -1,95 +1,239 @@
-textarea {
-    min-height: 400px;
-}
-
-.emailDiv {
-    border: solid 1px grey;
-    margin-bottom: 10px;
-    padding: 5px;
-    font-size: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.emailDiv button {
-    text-align: right;
-}
-
-h4 {
-    font-size: 20px;
-}
-
-h5 {
-    font-size: 15px;
-}
-
-#header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-#right-header {
-    text-align: right;
-    display: flex;
-    align-items: flex-end;
-    flex-direction: column;
-    height: auto;
-}
-
-img {
-    height: 30px;
-    width: 30px;
-    background-color: transparent;
-}
-
-.myButtons {
-    font-size: 12px;
-    font-weight: bold;
-    position: relative;
-    display: inline-block;
-    padding: 5px;
-    border: none;
-    height: 50px;
-    width: 50px;
-    background-color: transparent;
-    border-radius: 50%;
-}
-
-.myButtons:hover {
-    background-color: rgba(192, 192, 192, 0.5);
-}
-
-span {
-    font-size: 10px;
-    visibility: hidden;
-    position: absolute;
-    background-color: rgba(0, 0, 0, 0.6);
-    width: 60px;
-    bottom: 105%;
-    left: 50%;
-    margin-left: -30px;
-    color: white;
-    text-align: center;
-    border-radius: 5px;
-    z-index: 1;
-}
-
-.myButtons:hover span {
-    visibility: visible;
-}
-
-#body-container {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 20px;
-}
-
-#email-body {
-    border: solid 2px rgba(192, 192, 192, 0.5);
-    border-radius: 5px;
-    padding: 15px;
-    width: 65%;
-}
+    @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap');
+    element {
+        --bgColor: #eaf1fb;
+        --navColor: black;
+    }
+    
+    body {
+        font-family: 'Open Sans', sans-serif;
+    }
+    
+    .container {
+        display: flex;
+        flex-direction: column;
+        align-items: space-between;
+        flex-shrink: unset;
+    }
+    
+    #nav-button {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 30px;
+        width: 30px;
+        margin: 10px;
+    }
+    
+    #nav-button:hover {
+        cursor: pointer;
+    }
+    
+    #navbar {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 15%;
+        height: 100%;
+        background-color: #eaf1fb;
+        padding-left: 1%;
+        z-index: 2;
+        margin-right: 5%;
+    }
+    
+    ul {
+        list-style-type: none;
+        width: 100%;
+        padding-left: 0;
+    }
+    
+    ul li:first-child {
+        font-size: 1.75rem;
+        font-weight: 600;
+        padding-left: 0;
+        display: flex;
+        justify-content: space-between;
+        color: #0b57d0;
+    }
+    
+    ul li:first-child:hover {
+        background-color: #eaf1fb;
+    }
+    
+    #home-container {
+        display: flex;
+        align-items: center;
+    }
+    
+    ul li:last-child {
+        position: relative;
+        margin-top: 75vh;
+    }
+    
+    li {
+        display: flex;
+        align-items: center;
+        list-style-type: none;
+        width: 100%;
+        padding: 5px;
+        padding-left: 15px;
+        font-size: 1rem;
+        font-weight: 600;
+        background-color: var(--bgColor);
+        border-radius: 16px;
+        color: var(--navColor);
+    }
+    
+    li:hover {
+        cursor: pointer;
+        background-color: var(--bgColorHover);
+    }
+    
+    a {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: black;
+    }
+    
+    a:hover {
+        text-decoration: none;
+        color: black;
+    }
+    
+    h2 {
+        margin-top: 1rem;
+    }
+    
+    textarea {
+        min-height: 400px;
+    }
+    
+    .emailDiv {
+        border: solid 1px grey;
+        margin-bottom: 10px;
+        padding: 5px;
+        font-size: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+    
+    .emailDiv button {
+        text-align: right;
+    }
+    
+    h4 {
+        font-size: 20px;
+    }
+    
+    h5 {
+        font-size: 15px;
+    }
+    
+    #header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    #right-header {
+        text-align: right;
+        display: flex;
+        align-items: flex-end;
+        flex-direction: column;
+        height: auto;
+    }
+    
+    img {
+        height: 30px;
+        width: 30px;
+        background-color: transparent;
+    }
+    
+    .myButtons {
+        font-size: 12px;
+        font-weight: bold;
+        position: relative;
+        display: inline-block;
+        padding: 5px;
+        border: none;
+        height: 50px;
+        width: 50px;
+        background-color: transparent;
+        border-radius: 50%;
+    }
+    
+    .myButtons:hover {
+        background-color: rgba(192, 192, 192, 0.5);
+    }
+    
+    span {
+        font-size: 10px;
+        visibility: hidden;
+        position: absolute;
+        background-color: rgba(0, 0, 0, 0.6);
+        width: 60px;
+        bottom: 105%;
+        left: 50%;
+        margin-left: -30px;
+        color: white;
+        text-align: center;
+        border-radius: 5px;
+        z-index: 1;
+    }
+    
+    .myButtons:hover span {
+        visibility: visible;
+    }
+    
+    #body-container {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-top: 20px;
+    }
+    
+    #email-body {
+        border: solid 2px rgba(192, 192, 192, 0.5);
+        border-radius: 5px;
+        padding: 15px;
+        width: 65%;
+    }
+    
+    @media only screen and (max-width: 1600px) {
+        #navbar {
+            display: none;
+        }
+        #nav-button {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 30px;
+            width: 30px;
+            margin: 10px;
+        }
+        #navbar {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 25%;
+            height: 100%;
+            background-color: #eaf1fb;
+            padding-left: 1%;
+            z-index: 2;
+            margin-right: 5%;
+        }
+        ul li:last-child {
+            position: relative;
+            margin-top: 70vh;
+        }
+    }

@@ -1,11 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // Use buttons to toggle between views
+
     document.querySelector('#inbox').addEventListener('click', () => load_mailbox('inbox'));
     document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
     document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
     document.querySelector('#compose').addEventListener('click', compose_email);
-
+    document.querySelector('#home').addEventListener('click', () => load_mailbox('inbox'));
+    document.querySelector('#nav-button').addEventListener('click', () => {
+        document.querySelector('#navbar').style.display = 'flex';
+    });
+    document.querySelector('#close').addEventListener('click', () => {
+        document.querySelector('#navbar').style.display = 'none';
+        document.querySelector('#nav-button').style.display = 'flex';
+    });
     // By default, load the inbox
     load_mailbox('inbox');
 });
@@ -148,6 +156,7 @@ function full_email(email) {
         archive.style.display = 'none';
     } else if (email.archived == true) {
         archive.appendChild(unarchiveImage);
+        archiveTip.innerText = 'Unarchive';
         placeholder = false;
     } else {
         archive.appendChild(archiveImage);
@@ -215,7 +224,16 @@ function compose_email() {
     // Show compose view and hide other views
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'block';
-
+    const navList = document.querySelectorAll("li");
+    navList.forEach(item => {
+        item.style.setProperty('--bgColor', '#eaf1fb');
+        item.style.setProperty('--bgColorHover', '#ddd');
+        item.style.setProperty('--navColor', 'black');
+    });
+    let current = document.querySelector('#compose');
+    current.style.setProperty('--bgColor', '#d3e3fd');
+    current.style.setProperty('--bgColorHover', '#d3e3fd');
+    current.style.setProperty('--navColor', '#007bff');
     // Clear out composition fields
     document.querySelector('#compose-recipients').value = '';
     document.querySelector('#compose-subject').value = '';
@@ -238,7 +256,16 @@ function load_mailbox(mailbox) {
 
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
     if (mailbox == 'sent') {
-        event.preventDefault();
+        const navList = document.querySelectorAll("li");
+        navList.forEach(item => {
+            item.style.setProperty('--bgColor', '#eaf1fb');
+            item.style.setProperty('--bgColorHover', '#ddd');
+            item.style.setProperty('--navColor', 'black');
+        });
+        let current = document.querySelector('#sent');
+        current.style.setProperty('--bgColor', '#d3e3fd');
+        current.style.setProperty('--bgColorHover', '#d3e3fd');
+        current.style.setProperty('--navColor', '#007bff');
         fetch('/emails/sent').then(response => response.json())
             .then(emails => {
                 console.log(emails);
@@ -254,29 +281,48 @@ function load_mailbox(mailbox) {
                 })
             }).catch(error => console.log(error));
     } else if (mailbox == 'archive') {
-
+        const navList = document.querySelectorAll("li");
+        navList.forEach(item => {
+            item.style.setProperty('--bgColor', '#eaf1fb');
+            item.style.setProperty('--bgColorHover', '#ddd');
+            item.style.setProperty('--navColor', 'black');
+        });
+        let current = document.querySelector('#archived');
+        current.style.setProperty('--bgColor', '#d3e3fd');
+        current.style.setProperty('--bgColorHover', '#d3e3fd');
+        current.style.setProperty('--navColor', '#007bff');
         fetch('/emails/archive').then(response => response.json())
             .then(emails => {
                 console.log("email array: " + emails);
                 if (emails.length <= 0) {
                     return 1;
+                } else {
+                    emails.forEach(email => {
+                        // create html to display the emails content
+                        emailDiv = display_mail(email);
+                        if (email.read) {
+                            emailDiv.style["background-color"] = ("rgba(192,192,192,.4");
+                        }
+
+                        emailDiv.addEventListener('click', function() {
+
+                            full_email(email);
+
+                        });
+                    })
                 }
-                emails.forEach(email => {
-                    // create html to display the emails content
-                    emailDiv = display_mail(email);
-                    if (email.read) {
-                        emailDiv.style["background-color"] = ("rgba(192,192,192,.4");
-                    }
-
-                    emailDiv.addEventListener('click', function() {
-
-                        full_email(email);
-
-                    });
-                }).catch(error => console.log(error));
-            })
+            }).catch(error => console.log(error));
     } else if (mailbox === 'inbox') {
-
+        const navList = document.querySelectorAll("li");
+        navList.forEach(item => {
+            item.style.setProperty('--bgColor', '#eaf1fb');
+            item.style.setProperty('--bgColorHover', '#ddd');
+            item.style.setProperty('--navColor', 'black');
+        });
+        let current = document.querySelector('#inbox');
+        current.style.setProperty('--bgColor', '#d3e3fd');
+        current.style.setProperty('--bgColorHover', '#d3e3fd');
+        current.style.setProperty('--navColor', '#007bff');
         fetch('/emails/inbox').then(response => response.json())
             .then(emails => {
                 console.log("email array: " + emails);

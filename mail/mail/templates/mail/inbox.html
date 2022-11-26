@@ -2,17 +2,28 @@
 {% load static %}
 
 {% block body %}
+    <div id='nav-button'><box-icon name='menu' size='md'></box-icon></div>
+    <div id="navbar">
+        <ul>
+            <li id="home"><div id="home-container"><box-icon name='home-alt-2'></box-icon>&nbsp; Home </div><div id='close'><box-icon name='x'></box-icon></div></li>
+        
+            <li id="inbox">
+                <box-icon name="envelope"></box-icon>&nbsp; Inbox</li>
+            <li id="compose">
+                <box-icon name="plus-circle"></box-icon>&nbsp; Create</li>
+            <li id="sent">
+                <box-icon name="send"></box-icon>&nbsp; Sent</li>
+            <li id="archived">
+                <box-icon name="collection"></box-icon>&nbsp; Archived</li>
+            <li id="logout"><a href="{% url 'logout' %}">
+                <box-icon name="exit"></box-icon>&nbsp; Log Out</a></li>
+        </ul>
+    </div>
+    <div id='#main-container'>
     <h2>{{ request.user.email }}</h2>
-
-    <button class="btn btn-sm btn-outline-primary" id="inbox">Inbox</button>
-    <button class="btn btn-sm btn-outline-primary" id="compose">Create</button>
-    <button class="btn btn-sm btn-outline-primary" id="sent">Sent</button>
-    <button class="btn btn-sm btn-outline-primary" id="archived">Archived</button>
-    <a class="btn btn-sm btn-outline-primary" href="{% url 'logout' %}">Log Out</a>
     <hr>
-
     <div id="emails-view">
-
+    
     </div>
     <div id="compose-view">
         <h3>New Email</h3>
@@ -30,8 +41,10 @@
             <input type="submit" id="compose-submit" class="btn btn-primary"/>
         </form>
     </div>
+</div>
 {% endblock %}
 
 {% block script %}
     <script src="{% static 'mail/inbox.js' %}"></script>
+    <script type="module" src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 {% endblock %}
