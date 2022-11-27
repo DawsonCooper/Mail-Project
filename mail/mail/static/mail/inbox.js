@@ -7,15 +7,27 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
     document.querySelector('#compose').addEventListener('click', compose_email);
     document.querySelector('#home').addEventListener('click', () => load_mailbox('inbox'));
-    document.querySelector('#nav-button').addEventListener('click', () => {
-        document.querySelector('#navbar').style.display = 'flex';
-    });
-    document.querySelector('#close').addEventListener('click', () => {
-        document.querySelector('#navbar').style.display = 'none';
-        document.querySelector('#nav-button').style.display = 'flex';
-    });
+
+
     // By default, load the inbox
     load_mailbox('inbox');
+    // Event listeners for sidebar open and close events
+    document.querySelector('#close').addEventListener('click', () => {
+        document.querySelector('#navbar').classList.remove('sidebarOpen');
+        document.querySelector('#navbar').classList.toggle('sidebarClose');
+        document.querySelector('#navBarList').style.display = 'none';
+        document.querySelector('#nav-button').style.display = 'flex';
+    });
+    document.querySelector('#nav-button').addEventListener('click', () => {
+        document.querySelector('#navbar').classList.remove('sidebarClose');
+        document.querySelector('#nav-button').style.display = 'none';
+        document.querySelector('#navbar').classList.toggle('sidebarOpen');
+        setTimeout(() => {
+            document.querySelector('#navBarList').style.display = 'block'
+        }, 150);
+
+
+    });
 });
 
 //------- FUNCTION WILL BE USED IN FOR EACH LOOP LOADS EMAIL USING PASSED ARGUMENT ---------/
@@ -115,32 +127,50 @@ function full_email(email) {
     });
     reply.addEventListener('click', function() {
             // Hide the email view and load compose view
+            localStorage.clear();
             document.querySelector('#emails-view').style.display = 'none';
-            document.querySelector('#compose-view').style.display = 'block';
+
             // modify compose subject field to match current emails subject and recipient should match current emails sender
             document.querySelector('#compose-subject').setAttribute('value', "Re: " + email.subject);
+
             // Need to check the select menu and get its value
             console.log(recipients.value);
-            if (recipients.value != "") {
-                document.querySelector('#compose-recipients').setAttribute('value', recipients.value);
+            if (recipients.value == "") {
+                document.querySelector('#compose-recipients').defaultValue = email.sender;
+            } else if (recipients.value == currentUser) {
+                document.querySelector('#compose-recipients').defaultValue = email.sender;
             } else {
-                document.querySelector('#compose-recipients').setAttribute('value', email.sender);
+                document.querySelector('#compose-recipients').defaultValue = recipients.value;
             }
-            document.querySelector('#compose-body').innerText = `${currUserName}'s response to ${usernameString}'s email: ${email.body}.`;
+
+            document.querySelector('#compose-body').innerText = `${currUserName}'s response to ${usernameString}'s email: "${email.body}".`;
+            document.querySelector('#compose-subject').setAttribute('disabled', true);
+            document.querySelector('#compose-recipients').setAttribute('disabled', true);
+            document.querySelector('#compose-view').style.display = 'block';
         })
         // replyAll event lister
     replyAll.addEventListener('click', function() {
+        localStorage.clear();
         let all = []
         email.recipients.forEach(user => {
             if (user != currentUser) {
                 all.push(user);
             }
         })
+
         document.querySelector('#emails-view').style.display = 'none';
-        document.querySelector('#compose-view').style.display = 'block';
-        document.querySelector('#compose-subject').setAttribute('value', "Re: " + email.subject);
+
+
+        document.querySelector('#compose-subject').defaultValue = "Re: " + email.subject;
         document.querySelector('#compose-body').innerText = `${currUserName}'s response to ${usernameString}'s email: ${email.body}.`;
-        document.querySelector('#compose-recipients').setAttribute('value', all + "," + email.sender);
+        if (all.length <= 0) {
+            document.querySelector('#compose-recipients').setAttribute('value', email.sender);
+        } else {
+            document.querySelector('#compose-recipients').setAttribute('value', all + "," + email.sender);
+        }
+        document.querySelector('#compose-recipients').setAttribute('disabled', true);
+        document.querySelector('#compose-subject').setAttribute('disabled', true);
+        document.querySelector('#compose-view').style.display = 'block';
     });
     // FILLS RIGHT HEADER //
     var placeholder;
@@ -212,18 +242,21 @@ function compose_send() {
         .then(result => {
             // Print result
             console.log(result);
-        }).catch(error => console.log(error));
+        }).catch(error => { alert('Email failed to send' + error.message) });
     localStorage.clear();
+    event.preventDefault();
     load_mailbox('sent');
-    return false;
+    return true;
 
 }
 
 function compose_email() {
-
+    localStorage.clear();
+    document.querySelector('#compose-recipients').removeAttribute('disabled');
+    document.querySelector('#compose-subject').removeAttribute('disabled');
     // Show compose view and hide other views
     document.querySelector('#emails-view').style.display = 'none';
-    document.querySelector('#compose-view').style.display = 'block';
+
     const navList = document.querySelectorAll("li");
     navList.forEach(item => {
         item.style.setProperty('--bgColor', '#eaf1fb');
@@ -235,14 +268,18 @@ function compose_email() {
     current.style.setProperty('--bgColorHover', '#d3e3fd');
     current.style.setProperty('--navColor', '#007bff');
     // Clear out composition fields
-    document.querySelector('#compose-recipients').value = '';
-    document.querySelector('#compose-subject').value = '';
-    document.querySelector('#compose-body').value = '';
-
+    let composeRecipients = document.querySelector('#compose-recipients');
+    composeRecipients.defaultValue = '';
+    let composeSubject = document.querySelector('#compose-subject');
+    composeSubject.defaultValue = '';
+    let composeBody = document.querySelector('#compose-body');
+    composeBody.defaultValue = '';
+    document.querySelector('#compose-view').style.display = 'block';
 
 
     // Once page is cleared, and loaded we will want to listen to the submit button 
-    document.querySelector('#compose-form').addEventListener('submit', compose_send)
+    document.querySelector('#compose-submit').addEventListener('click', compose_send)
+    return false;
 }
 
 function load_mailbox(mailbox) {

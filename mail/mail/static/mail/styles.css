@@ -237,3 +237,67 @@
             margin-top: 70vh;
         }
     }
+    
+    @media only screen and (min-width: 2000px) {
+        ul li:last-child {
+            position: relative;
+            margin-top: 82vh;
+        }
+    }
+    
+    .sidebarClose {
+        animation: sidebarClose .2s ease-in-out;
+        animation-fill-mode: forwards;
+    }
+    
+    .sidebarOpen {
+        animation: sidebarOpen .2s ease-in-out;
+        animation-fill-mode: forwards;
+    }
+    
+    @keyframes sidebarClose {
+        0% {
+            width: 10%;
+            height: 75%;
+        }
+        25% {
+            width: 7%;
+            height: 50%;
+        }
+        50% {
+            width: 4%;
+            height: 25%;
+        }
+        75% {
+            width: 2%;
+            height: 2.5%;
+        }
+        100% {
+            width: .5%;
+            height: .5%;
+            visibility: hidden;
+        }
+    }
+    
+    @keyframes sidebarOpen {
+        0% {
+            display: flex;
+            width: .5%;
+            height: .5%;
+        }
+        25% {
+            width: 4%;
+            height: 25%;
+        }
+        50% {
+            width: 7%;
+            height: 50%;
+        }
+        75% {
+            width: 10%;
+            height: 75%;
+        }
+        100% {
+            display: flex;
+        }
+    }
