@@ -99,6 +99,9 @@ function full_email(email) {
     usernameString = usernameString.charAt(0).toUpperCase() + usernameString.slice(1);
     let sender = document.createElement('p')
     sender.innerText = (`${usernameString} <${email.sender}>`);
+    let subject = document.createElement('p');
+    subject.innerText = (email.subject);
+    leftHeader.appendChild(subject);
     let recipients = document.createElement('select');
     let firstOption = document.createElement('option');
     firstOption.innerText = "Recipients: ";
@@ -121,9 +124,12 @@ function full_email(email) {
                 archived: placeholder
             })
         }).catch(error => alert("email archive failed: " + error))
-        location.reload(true);
-        load_mailbox("inbox");
-        return 0;
+        setTimeout(() => {
+            load_mailbox('inbox')
+        }, 500);
+
+
+        return false;
     });
     reply.addEventListener('click', function() {
             // Hide the email view and load compose view
@@ -131,8 +137,11 @@ function full_email(email) {
             document.querySelector('#emails-view').style.display = 'none';
 
             // modify compose subject field to match current emails subject and recipient should match current emails sender
-            document.querySelector('#compose-subject').setAttribute('value', "Re: " + email.subject);
-
+            if (email.subject[0] == 'R' && email.subject[1] == 'e' && email.subject[2] == ':') {
+                document.querySelector('#compose-subject').setAttribute('value', email.subject);
+            } else {
+                document.querySelector('#compose-subject').setAttribute('value', "Re: " + email.subject);
+            }
             // Need to check the select menu and get its value
             console.log(recipients.value);
             if (recipients.value == "") {
@@ -143,10 +152,11 @@ function full_email(email) {
                 document.querySelector('#compose-recipients').defaultValue = recipients.value;
             }
 
-            document.querySelector('#compose-body').innerText = `${currUserName}'s response to ${usernameString}'s email: "${email.body}".`;
+            document.querySelector('#compose-body').value = `${currUserName}'s response to ${usernameString}'s email from: ${email.timestamp} "${email.body}".`;
             document.querySelector('#compose-subject').setAttribute('disabled', true);
             document.querySelector('#compose-recipients').setAttribute('disabled', true);
             document.querySelector('#compose-view').style.display = 'block';
+            return false;
         })
         // replyAll event lister
     replyAll.addEventListener('click', function() {
@@ -159,10 +169,13 @@ function full_email(email) {
         })
 
         document.querySelector('#emails-view').style.display = 'none';
-
-
-        document.querySelector('#compose-subject').defaultValue = "Re: " + email.subject;
-        document.querySelector('#compose-body').innerText = `${currUserName}'s response to ${usernameString}'s email: ${email.body}.`;
+        console.log(email.subject);
+        if (email.subject[0] == 'R' && email.subject[1] == 'e' && email.subject[2] == ':') {
+            document.querySelector('#compose-subject').setAttribute('value', email.subject);
+        } else {
+            document.querySelector('#compose-subject').setAttribute('value', "Re: " + email.subject);
+        }
+        document.querySelector('#compose-body').value = `${currUserName}'s response to ${usernameString}'s email from: ${email.timestamp} "${email.body}".`;
         if (all.length <= 0) {
             document.querySelector('#compose-recipients').setAttribute('value', email.sender);
         } else {
@@ -171,6 +184,7 @@ function full_email(email) {
         document.querySelector('#compose-recipients').setAttribute('disabled', true);
         document.querySelector('#compose-subject').setAttribute('disabled', true);
         document.querySelector('#compose-view').style.display = 'block';
+        return false;
     });
     // FILLS RIGHT HEADER //
     var placeholder;
@@ -184,6 +198,8 @@ function full_email(email) {
     unarchiveImage.src = "static/mail/images/unarchive.jpg";
     if (email.sender == currentUser) {
         archive.style.display = 'none';
+        reply.style.display = 'none';
+        replyAll.style.display = 'none';
     } else if (email.archived == true) {
         archive.appendChild(unarchiveImage);
         archiveTip.innerText = 'Unarchive';
@@ -221,7 +237,7 @@ function full_email(email) {
 
 
     emailsView.appendChild(emailSection);
-    return 0;
+    return false;
 
     // LISTENS TO BUTTONS//
 }
@@ -245,17 +261,29 @@ function compose_send() {
         }).catch(error => { alert('Email failed to send' + error.message) });
     localStorage.clear();
     event.preventDefault();
-    load_mailbox('sent');
-    return true;
+    setTimeout(() => {
+        load_mailbox('sent');
+    }, 500);
+
+    return false;
 
 }
 
 function compose_email() {
     localStorage.clear();
+    const empty = '';
+    document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#compose-recipients').removeAttribute('disabled');
     document.querySelector('#compose-subject').removeAttribute('disabled');
     // Show compose view and hide other views
-    document.querySelector('#emails-view').style.display = 'none';
+
+    let composeRecipients = document.querySelector('#compose-recipients');
+    composeRecipients.defaultValue = '';
+    let composeSubject = document.querySelector('#compose-subject');
+    composeSubject.defaultValue = '';
+    let composeBody = document.querySelector('#compose-body');
+    composeBody.innerTextContent = empty;
+    composeBody.value = empty;
 
     const navList = document.querySelectorAll("li");
     navList.forEach(item => {
@@ -268,12 +296,7 @@ function compose_email() {
     current.style.setProperty('--bgColorHover', '#d3e3fd');
     current.style.setProperty('--navColor', '#007bff');
     // Clear out composition fields
-    let composeRecipients = document.querySelector('#compose-recipients');
-    composeRecipients.defaultValue = '';
-    let composeSubject = document.querySelector('#compose-subject');
-    composeSubject.defaultValue = '';
-    let composeBody = document.querySelector('#compose-body');
-    composeBody.defaultValue = '';
+
     document.querySelector('#compose-view').style.display = 'block';
 
 
@@ -332,7 +355,7 @@ function load_mailbox(mailbox) {
             .then(emails => {
                 console.log("email array: " + emails);
                 if (emails.length <= 0) {
-                    return 1;
+                    return false;
                 } else {
                     emails.forEach(email => {
                         // create html to display the emails content
